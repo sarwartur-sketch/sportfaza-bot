@@ -1,5 +1,6 @@
 import requests
 import os
+import xml.etree.ElementTree as ET
 
 # Telegram
 TG_TOKEN = os.getenv("TG_TOKEN")
@@ -8,27 +9,20 @@ CHAT_ID = os.getenv("CHAT_ID")
 # Telegraph
 TELEGRAPH_TOKEN = os.getenv("TELEGRAPH_TOKEN")
 
-# VK паблик
-VK_DOMAIN = "fitness_gym"
-VK_TOKEN = os.getenv("VK_TOKEN")
+# RSS VK
+RSS_URL = "https://rss.app/feeds/v1.1/_R4XLK7Vw6eKxQz8m.xml"
 
-# Получаем посты
-vk_url = f"https://api.vk.com/method/wall.get?domain={VK_DOMAIN}&count=1&access_token={VK_TOKEN}&v=5.131"
+# Получаем RSS
+response = requests.get(RSS_URL)
 
-response = requests.get(vk_url).json()
+root = ET.fromstring(response.content)
 
-print(response)
+item = root.find("./channel/item")
 
-# Проверка ответа VK
-if "response" not in response:
-    raise Exception(f"VK ERROR: {response}")
+title = item.find("title").text
+description = item.find("description").text
 
-post = response["response"]["items"][0]
-
-text = post.get("text", "Новый пост")
-
-# Заголовок
-title = text.split("\n")[0][:80]
+text = f"{title}\n\n{description}"
 
 # Telegraph
 telegraph_url = "https://api.telegra.ph/createPage"
@@ -46,8 +40,6 @@ telegraph_response = requests.post(
     json=telegraph_data
 ).json()
 
-print(telegraph_response)
-
 page_url = telegraph_response["result"]["url"]
 
 # Telegram
@@ -60,10 +52,13 @@ message = f"""
 {page_url}
 """
 
-telegram_response = requests.post(telegram_url, data={
-    "chat_id": CHAT_ID,
-    "text": message
-})
+telegram_response = requests.post(
+    telegram_url,
+    data={
+        "chat_id": CHAT_ID,
+        "text": message
+    }
+)
 
 print(telegram_response.text)
 
