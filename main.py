@@ -10,7 +10,7 @@ CHAT_ID = os.getenv("CHAT_ID")
 TELEGRAPH_TOKEN = os.getenv("TELEGRAPH_TOKEN")
 
 # VK страница
-VK_URL = "https://vk.com/fitness_gym"
+VK_URL = "https://vk.ru/metabolism"
 
 headers = {
     "User-Agent": "Mozilla/5.0"
