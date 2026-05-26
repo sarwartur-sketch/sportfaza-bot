@@ -9,7 +9,7 @@ CHAT_ID = os.getenv("CHAT_ID")
 TELEGRAPH_TOKEN = os.getenv("TELEGRAPH_TOKEN")
 
 # VK паблик
-VK_DOMAIN = "fitness_technology"
+VK_DOMAIN = "fitness_gym"
 
 # Получаем последний пост
 vk_url = f"https://api.vk.com/method/wall.get?domain={VK_DOMAIN}&count=1&v=5.131"
