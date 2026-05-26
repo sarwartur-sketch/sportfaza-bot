@@ -10,9 +10,10 @@ TELEGRAPH_TOKEN = os.getenv("TELEGRAPH_TOKEN")
 
 # VK паблик
 VK_DOMAIN = "fitness_gym"
+VK_TOKEN = os.getenv("VK_TOKEN")
 
 # Получаем посты
-vk_url = f"https://api.vk.com/method/wall.get?domain={VK_DOMAIN}&count=1&v=5.131"
+vk_url = f"https://api.vk.com/method/wall.get?domain={VK_DOMAIN}&count=1&access_token={VK_TOKEN}&v=5.131"
 
 response = requests.get(vk_url).json()
 
