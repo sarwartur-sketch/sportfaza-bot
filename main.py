@@ -11,10 +11,16 @@ TELEGRAPH_TOKEN = os.getenv("TELEGRAPH_TOKEN")
 # VK паблик
 VK_DOMAIN = "fitness_gym"
 
-# Получаем последний пост
+# Получаем посты
 vk_url = f"https://api.vk.com/method/wall.get?domain={VK_DOMAIN}&count=1&v=5.131"
 
 response = requests.get(vk_url).json()
+
+print(response)
+
+# Проверка ответа VK
+if "response" not in response:
+    raise Exception(f"VK ERROR: {response}")
 
 post = response["response"]["items"][0]
 
@@ -23,7 +29,7 @@ text = post.get("text", "Новый пост")
 # Заголовок
 title = text.split("\n")[0][:80]
 
-# Создаем статью Telegraph
+# Telegraph
 telegraph_url = "https://api.telegra.ph/createPage"
 
 telegraph_data = {
@@ -39,9 +45,11 @@ telegraph_response = requests.post(
     json=telegraph_data
 ).json()
 
+print(telegraph_response)
+
 page_url = telegraph_response["result"]["url"]
 
-# Публикация в Telegram
+# Telegram
 telegram_url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
 
 message = f"""
@@ -51,9 +59,11 @@ message = f"""
 {page_url}
 """
 
-requests.post(telegram_url, data={
+telegram_response = requests.post(telegram_url, data={
     "chat_id": CHAT_ID,
     "text": message
 })
+
+print(telegram_response.text)
 
 print("POSTED")
