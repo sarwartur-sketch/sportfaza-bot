@@ -1,6 +1,6 @@
 import requests
 import os
-import xml.etree.ElementTree as ET
+import re
 
 # Telegram
 TG_TOKEN = os.getenv("TG_TOKEN")
@@ -9,20 +9,30 @@ CHAT_ID = os.getenv("CHAT_ID")
 # Telegraph
 TELEGRAPH_TOKEN = os.getenv("TELEGRAPH_TOKEN")
 
-# RSS VK
-RSS_URL = "https://rss.app/feeds/v1.1/_R4XLK7Vw6eKxQz8m.xml"
+# VK страница
+VK_URL = "https://vk.com/fitness_gym"
 
-# Получаем RSS
-response = requests.get(RSS_URL)
+headers = {
+    "User-Agent": "Mozilla/5.0"
+}
 
-root = ET.fromstring(response.content)
+response = requests.get(VK_URL, headers=headers)
 
-item = root.find("./channel/item")
+html = response.text
 
-title = item.find("title").text
-description = item.find("description").text
+# Ищем текст поста
+posts = re.findall(r'"text":"(.*?)"', html)
 
-text = f"{title}\n\n{description}"
+if not posts:
+    raise Exception("Посты не найдены")
+
+text = posts[0]
+
+# Чистим текст
+text = text.replace("\\n", "\n")
+text = re.sub(r'<.*?>', '', text)
+
+title = text.split("\n")[0][:80]
 
 # Telegraph
 telegraph_url = "https://api.telegra.ph/createPage"
@@ -39,6 +49,8 @@ telegraph_response = requests.post(
     telegraph_url,
     json=telegraph_data
 ).json()
+
+print(telegraph_response)
 
 page_url = telegraph_response["result"]["url"]
 
